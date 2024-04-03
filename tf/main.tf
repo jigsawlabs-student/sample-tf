@@ -9,9 +9,15 @@ resource "aws_instance" "ec2_instance" {
   key_name = "example" # update this
   user_data = <<-EOF
   #!/bin/bash
+  export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+  export REGION=us-east-1
+  export REPOSITORY_NAME=flask_app_sample
   sudo yum update -y
   sudo yum install docker -y
   sudo systemctl start docker
+  aws ecr get-login-password --region $REGION | sudo docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+  sudo docker pull $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY_NAME:latest
+  sudo docker run -p 80:80 $REPOSITORY_NAME:latest
   EOF
 
   vpc_security_group_ids = [aws_security_group.http_backend_security.id, aws_security_group.ssh_backend_security.id]
