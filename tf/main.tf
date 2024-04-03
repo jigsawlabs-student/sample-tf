@@ -21,9 +21,6 @@ resource "aws_instance" "ec2_instance" {
   sudo docker pull $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY_NAME:latest
 
   while ! sudo docker container ls | grep -wq $BACKEND_CONTAINER; do
-    export REGION=us-east-1
-    export BACKEND_CONTAINER=flask_api
-    export REPOSITORY_NAME=flask_app_sample
     sudo docker run -d -p 80:80 --name $BACKEND_CONTAINER --platform=linux/amd64/v2 $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY_NAME
     sleep 5
   done
