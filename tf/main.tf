@@ -9,6 +9,7 @@ resource "aws_instance" "ec2_instance" {
   key_name = "example" # update this
   user_data = <<-EOF
   #!/bin/bash
+  
   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
   export REGION=us-east-1
   export BACKEND_CONTAINER=flask_api
